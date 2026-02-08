@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ block.super }} - My Portfolio{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">{{ portfolio.name }}</h1>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    <h2 class="mb-3">Add Holding (Mutual Fund or ETF) </h2>
+    <form method="post" class="needs-validation">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="mb-3">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <div class="form-text">{{ field.help_text }}</div>
+                {% endif %}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Add Holding</button>
+    </form>
+    <h2 class="mt-5 mb-3">Current Holdings</h2>
+    Total portfolio value: ${{ total_invested }}
+    {% if holdings %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Fund Symbol</th>
+                    <th>Fund Name</th>
+                    <th>Shares</th>
+                    <th>NAV</th>
+                    <th>Dollars Invested</th>
+                    <th>% of Portfolio</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for holding in holdings %}
+                    <tr>
+                        <td>{{ holding.fund.ticker }}</td>
+                        <td>{{ holding.fund.name }}</td>
+                        <td>{{ holding.shares }}</td>
+                        <td>
+                            <form method="post" action="{% url 'update_nav' holding.id %}">
+                                {% csrf_token %}
+                                <input type="number" step="0.01" name="custom_nav" value="{{ holding.fund.nav|default_if_none:'' }}" placeholder="Enter NAV">
+                                <button type="submit" class="btn">Update</button>
+                            </form>
+                        </td>
+                        <td>${{ holding.dollars_invested }}</td>
+                        <td>{{ holding.percent }}%</td>
+                        <td><a href="{% url 'delete_holding' pk=holding.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove this holding?');">Remove</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2 class="mt-5 mb-3">Regional Breakdown</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    {% for region in regions %}
+                        <th>{{ region }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tr>
+                <td>Your Allocation</td>
+                {% for region, percent in regions.items %}
+                    <td>{{ percent }}%</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>Total Stock Market Allocation</td>
+                {% for percent in total_regions %}
+                    <td>{{ percent }}%</td>
+                {% endfor %}
+            </tr>
+        </table>
+
+        <h2 class="mt-5 mb-3">International Region Breakdown</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    {% for region in intl_regions %}
+                        <th>{{ region }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tr>
+                <td>Your Allocation</td>
+                {% for region, percent in intl_regions.items %}
+                    <td>{{ percent }}%</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>Total International Stock Market Allocation</td>
+                {% for percent in total_intl_regions %}
+                    <td>{{ percent }}%</td>
+                {% endfor %}
+            </tr>
+        </table>
+
+        <h2 class="mt-5 mb-3">Style Allocations</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    {% for alloc in allocs %}
+                        <th>{{ alloc }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tr>
+                <td>Your Allocation</td>
+                {% for alloc, percent in allocs.items %}
+                    <td>{{ percent }}%</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>Total Stock Market Allocation</td>
+                {% for percent in total_allocs %}
+                    <td>{{ percent }}%</td>
+                {% endfor %}
+            </tr>
+        </table>
+
+        <h2 class="mt-5 mb-3">Sector Breakdown</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    {% for sector in sectors %}
+                        <th>{{ sector }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tr>
+                <td>Your Allocation</td>
+                {% for sector, percent in sectors.items %}
+                    <td>{{ percent }}%</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>Total Stock Market Sectors</td>
+                {% for percent in total_sectors %}
+                    <td>{{ percent }}%</td>
+                {% endfor %}
+            </tr>
+        </table>
+    {% else %}
+        <p class="text-muted">No holdings yet. Add one using the form above.</p>
+    {% endif %}
+</div>
+{% endblock %}

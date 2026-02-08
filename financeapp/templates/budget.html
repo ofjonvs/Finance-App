@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Budget - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Budget Overview</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form>
+        <label for="year-select"><strong>Year:</strong></label>
+        <select
+            id="year-select"
+            class="form-select d-inline w-auto"
+            onchange="location.href=this.value;"
+        >
+            {% for y in avail_years %}
+                <option
+                    value="{% url 'budget' year=y %}"
+                    {% if y == year %}selected{% endif %}
+                >
+                    {{ y }}
+                </option>
+            {% endfor %}
+        </select>
+    </form>
+
+    <form method="post" action="{% url 'set_income' %}">
+        {% csrf_token %}
+        Monthly Income:
+        <input type="text" name="income" value="{{ income }}">
+        <button type="submit" class="btn btn-sm">Set Income</button>
+    </form> <br> <br>
+
+    <h2>
+        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#addExpenseForm" aria-expanded="false" aria-controls="addExpenseForm" id="toggleBtn">
+            Add Expense
+        </button>
+    </h2>
+    <div class="collapse" id="addExpenseForm">
+        <form method="post" action="{% url 'budget' year=year%}">
+            {% csrf_token %}
+            {% for field in form %}
+            <div>
+                <label>{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                <p>{{ field.help_text }}</p>
+                {% endif %}
+                {% for error in field.errors %}
+                <p style="color: red;">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Add Expense</button>
+        </form>
+    </div><br>
+
+    <p>Avg Savings Per Month: ${{ savings }}</p>
+    <h3>Needs Summary</h3>
+    {{ needs_summary|safe }}
+    <h3>Wants Summary</h3>
+    {{ wants_summary|safe }}
+
+    {% for month, data in all_months.items %}
+        <h3>{{month}}</h3>
+        <p>Money Leftover: ${{ data.savings }} <br>
+            Needs Spending: ${{ data.total_needs }} <br>
+            Wants Spending: ${{ data.total_wants }} <br>
+            <button data-bs-toggle="collapse" data-bs-target="#{{month}}" class="btn btn-sm">View/Hide table</button>
+        </p>
+        <table class="table table-striped collapse" id="{{month}}">
+            <thead>
+                <th>Item</th>
+                <th>Category</th>
+                <th>Subcategory</th>
+                <th>Amount</th>
+                <th>Action</th>
+            </thead>
+            <tbody>
+                {% for row in data.expenses %}
+                    <tr>
+                        <td>{{ row.Item }}</td>
+                        <td>{{ row.Category }}</td>
+                        <td>{{ row.Subcategory }}</td>
+                        <td>${{ row.Amount }}</td>
+                        <td>
+                            <form method="post" action="{% url 'delete_expense' row.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove this holding?');">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+</div>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const collapseEl = document.getElementById('addExpenseForm');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const bsCollapse = new bootstrap.Collapse(collapseEl, { toggle: false });
+
+    collapseEl.addEventListener('shown.bs.collapse', () => {
+      toggleBtn.innerHTML = "Close Expense Form";
+    });
+
+    collapseEl.addEventListener('hidden.bs.collapse', () => {
+      toggleBtn.innerHTML = "Add Expense";
+    });
+  });
+</script>
+
+{% endblock %}

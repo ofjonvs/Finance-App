@@ -1,0 +1,15 @@
+venv/
+db.sqlite3
+financeapp/util.py
+financeapp/static
+.DS_Store
+.env
+sandbox.ipynb
+*.log
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+**/__pycache__/
+financeapp/migrations
+financeproj/settings.py
