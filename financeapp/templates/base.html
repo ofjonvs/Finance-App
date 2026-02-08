@@ -81,12 +81,8 @@
               <div class="classynav">
                 <ul id="nav">
                   <li><a href="{% url 'index' %}">Home</a></li>
-                  <li><a href="">About</a></li>
-                  <li><a href="">Products</a></li>
-                  <li><a href="">Contact</a></li>
-                  {% if user.is_superuser %}
-                  <li><a href="">Clients</a></li>
-                  {%endif%}
+                  <li><a href="{% url 'portfolio' %}">Portfolio</a></li>
+                  <li><a href="{% url 'budget' %}">Budget</a></li>
                 </ul>
               </div>
               <!-- Nav End -->
@@ -110,40 +106,6 @@
 
   <!-- ***** Footer Area Start ***** -->
   <footer class="footer-area bg-img bg-gradient-overlay">
-    <center>
-    <div class="container">
-      <div class="row">
-        <!-- Single Footer Widget -->
-        <div class="col-12 col-sm-6 col-lg-4">
-          <div class="single-footer-widget">
-            <a href="" class="d-block mb-4"><img src="{% static 'financeapp/img/logo.jpg' %}" alt=""></a>
-            <p>Etiam sutor risus, dapibus act elefend katen, lacinia sitamet denim. Mauris sagittis kansa interdum dignissim.</p>
-            <div class="footer-contact">
-              <p><i class="icon_mail"></i> jonas.fjds@gmail.com</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Single Footer Widget -->
-
-        <!-- Single Footer Widget -->
-
-
-        <!-- Single Footer Widget -->
-        <div class="col-12 col-sm-6 col-lg">
-          <div class="single-footer-widget">
-            <!-- Widget Title -->
-
-            <!-- Social Info -->
-            <div class="footer-social-info">
-              <a href="#" data-toggle="tooltip" data-placement="top" title="Twitter"><i class="fa fa-twitter"></i></a>
-              <a href="#" data-toggle="tooltip" data-placement="top" title="Linkedin"><i class="fa fa-linkedin"></i></a>
-              <a href="#" data-toggle="tooltip" data-placement="top" title="Instagram"><i class="fa fa-instagram"></i></a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Copywrite Area -->
     <div class="container">
@@ -157,7 +119,6 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
         </div>
       </div>
     </div>
-    </center>
   </footer>
   <!-- ***** Footer Area End ***** -->
 
